@@ -13,8 +13,8 @@ int main(int argc, char** argv)
     glutDisplayFunc(Display);
     glutReshapeFunc(Reshape);
     // Callback on mouse click and keyboard input
-    glutMouseFunc(MouseHandler);
     glutKeyboardFunc(KeyboardHandler);
+    glutSpecialFunc(SpecialKeyHandler);
     glutMainLoop();
     return 0;
 }

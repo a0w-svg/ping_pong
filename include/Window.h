@@ -15,8 +15,8 @@ void drawPaddle(int X, int Y);
 void DrawCenterLines();
 void DrawText(char* Text, int X, int Y, int Z);
     // Input
-void MouseHandler(int Button, int State, int X, int Y);
 void KeyboardHandler(unsigned char Key, int X, int Y);
+void SpecialKeyHandler(int key, int x, int y);
 void Init(void);
 
 void StartGame();

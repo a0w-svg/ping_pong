@@ -20,10 +20,11 @@ void StartGame()
     // ball hits the left paddle
     if(BallPosX - BallRadius + 5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
     {
-        if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - PaddleHeight)
+        if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - (PaddleHeight/2))
         {
             BallVelocityX  = -BallVelocityX;
             BallVelocityX += SpeedIncrement;
+            BallVelocityY += SpeedIncrement;
             PaddileVelocity += SpeedIncrement;
         }
     }
@@ -31,7 +32,7 @@ void StartGame()
     // ball hits the right paddle
     if(BallPosX + BallRadius - 5 > PaddleX && BallPosX - BallRadius < PaddleX)
     {
-        if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - PaddleHeight)
+        if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - (PaddleHeight/2))
             BallVelocityX = -BallVelocityX;
     }
     // player one scores
@@ -288,28 +289,7 @@ void DrawText(char* Text, int X, int Y, int Z)
     }
     glPopMatrix();
 }
-    // Input
-void MouseHandler(int Button, int State, int X, int Y)
-{
-    switch(Button)
-    {
-        case GLUT_LEFT_BUTTON:
-            if(State == GLUT_DOWN)
-            BallVelocityX = 1.5;
-            BallVelocityY = 1.5;
-            glutIdleFunc(StartGame);
-            break;
-        case GLUT_MIDDLE_BUTTON:
-            BallPosX = BallPosY = 0;
-            Player1PaddileY = Player2PaddileY = 0;
-            Player1Score = Player2Score = 0;
-            if(State == GLUT_DOWN)
-                glutIdleFunc(NULL);
-            break;
-        default:
-            break;
-    }
-}
+
 void KeyboardHandler(unsigned char Key, int X, int Y)
 {
     switch (Key)
@@ -326,17 +306,10 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
             Player1PaddileY -= PaddileVelocity;
         glutPostRedisplay();
         break;
-    // move player two paddile up
-    case 'p':
-        if(Player2PaddileY < PaddleBoundary)
-            Player2PaddileY += PaddileVelocity;
-        glutPostRedisplay();
-        break;
-    // move player two paddile down
-    case 'l':
-        if(Player2PaddileY > -PaddleBoundary)
-            Player2PaddileY -= PaddileVelocity;
-        glutPostRedisplay();
+    case ' ':
+        BallVelocityX = 1.2;
+        BallVelocityY = 1.2;
+        glutIdleFunc(StartGame);
         break;
     // exit on esc
     case 27:
@@ -345,4 +318,24 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
     default:
         break;
     }
+}
+
+void SpecialKeyHandler(int key, int x, int y)
+{
+    switch(key)
+    {
+        case GLUT_KEY_UP:
+            if(Player2PaddileY < PaddleBoundary)
+                Player2PaddileY += PaddileVelocity;
+            glutPostRedisplay();
+            break;
+        case GLUT_KEY_DOWN:
+            if(Player2PaddileY > -PaddleBoundary)
+                Player2PaddileY -= PaddileVelocity;
+            glutPostRedisplay();
+            break;
+        default:
+            break;
+    }
+
 }
