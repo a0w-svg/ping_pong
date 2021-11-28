@@ -10,15 +10,15 @@ void Init(void)
 void StartGame()
 {
     // move the ball
-    BallPosX += BallVelocityX;//BallVelocityX;
+    BallPosX += BallVelocityX;
     BallPosY += BallVelocityY;
     //printf("%f:%f", BallPosX, BallPosY);
 
     // ball hits the top or bottom 
-    if(BallPosY + BallRadius > OrthoY || BallPosY - BallRadius < -OrthoX)
+    if(BallPosY + BallRadius > OrthoY || BallPosY - BallRadius < -OrthoY)
         BallVelocityY = -BallVelocityY;
     // ball hits the left paddle
-    if(BallPosX - BallRadius - 5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
+    if(BallPosX - BallRadius + 5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
     {
         if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - PaddleHeight)
         {
@@ -29,23 +29,23 @@ void StartGame()
     }
 
     // ball hits the right paddle
-    if(BallPosX + BallRadius + 5 > PaddleX && BallPosX + BallRadius < PaddleX)
+    if(BallPosX + BallRadius - 5 > PaddleX && BallPosX - BallRadius < PaddleX)
     {
         if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - PaddleHeight)
             BallVelocityX = -BallVelocityX;
     }
     // player one scores
-    if(BallPosX + BallRadius > OrthoX)
+    if(BallPosX - BallRadius > OrthoX)
     {
         Player1Score++;
-        printf("Player 1 = %d\n", Player1Score);
+        //printf("Player 1 = %d\n", Player1Score);
         BallVelocityX = -BallVelocityX;
     }
     // player two scores
-    if(BallPosX - BallRadius < -OrthoX)
+    if(BallPosX + BallRadius < -OrthoX)
     {
         Player2Score++;
-        printf("Player 2 = %d\n", Player2Score);
+        //printf("Player 2 = %d\n", Player2Score);
         BallVelocityX = -BallVelocityX;
     }
     glutPostRedisplay();
@@ -96,7 +96,7 @@ void drawPaddle(int X, int Y)
     glTranslatef(X, Y, 0);
     glBegin(GL_QUADS);
     glColor3f(1.0, 1.0, 1.0);
-    int height = 300 / 2;
+    int height = PaddleHeight /  2 ;/// 2;
     glVertex2f(-5, height);
     glVertex2f(5, height);
     glVertex2f(5, -height);
@@ -295,8 +295,8 @@ void MouseHandler(int Button, int State, int X, int Y)
     {
         case GLUT_LEFT_BUTTON:
             if(State == GLUT_DOWN)
-            BallVelocityX = (rand() % 5) -  (rand() % 3);
-            BallVelocityY = (rand() % 5) -  (rand() % 3);
+            BallVelocityX = 1.5;
+            BallVelocityY = 1.5;
             glutIdleFunc(StartGame);
             break;
         case GLUT_MIDDLE_BUTTON:
@@ -327,14 +327,14 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
         glutPostRedisplay();
         break;
     // move player two paddile up
-    case GLUT_KEY_UP:
-        if(Player2PaddileY > PaddleBoundary)
+    case 'p':
+        if(Player2PaddileY < PaddleBoundary)
             Player2PaddileY += PaddileVelocity;
         glutPostRedisplay();
         break;
     // move player two paddile down
-    case GLUT_KEY_DOWN:
-        if(Player2PaddileY > - PaddleBoundary)
+    case 'l':
+        if(Player2PaddileY > -PaddleBoundary)
             Player2PaddileY -= PaddileVelocity;
         glutPostRedisplay();
         break;

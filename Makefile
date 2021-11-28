@@ -12,4 +12,4 @@ Window.o:
 	$(CC) -c src/Window.c $(CFLAGS)
 
 clean:
-	rm -f *.o $(APP_NAME)
+	rm -f src/*.o $(APP_NAME)
