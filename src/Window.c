@@ -1,5 +1,18 @@
 #include "../include/Window.h"
-#include "../include/Game.h"
+#include <GL/freeglut.h>
+// globals variables
+int WindowX = 800, WindowY = 1200;
+int OrthoX = 600, OrthoY = 400;
+// game variables
+char Score1[20] = {}, Score2[20] = {};
+GLint Player1Score = 0, Player2Score = 0;
+GLint Player1Life = 3, Player2Life = 3;
+GLint PaddleBoundary = 290, PaddleHeight = 100, PaddileVelocity = 30.0;
+GLint Player1PaddileY = 0, Player2PaddileY = 0, PaddleX = 595;
+GLfloat BallVelocityX = 0, BallVelocityY = 0, SpeedIncrement = 0.5;
+GLint BallPosX = 0, BallPosY = 0, BallRadius = 20;
+
+float red = 1.0, green = 0.0, blue = 0.0;
 void Init(void)
 {
     glClearColor(0.0, 0.0, 0.0, 0.0); // initialize display with black colors
@@ -24,7 +37,7 @@ void StartGame()
         if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - PaddleHeight)
         {
             BallVelocityX  = -BallVelocityX;
-            if(BallVelocityX < 5.0 && BallVelocityY < 5.0)
+            if(BallVelocityX < 7.0 && BallVelocityY < 7.0)
             {
                 BallVelocityX += SpeedIncrement;
                 BallVelocityY += SpeedIncrement;
@@ -36,6 +49,9 @@ void StartGame()
             Player1Score++;
             BallVelocityX = -BallVelocityX;
         }
+        red = (float)(rand()%255);
+        green = (float)(rand()%255);
+        blue = (float)(rand()%255);
     }
 
     // ball hits the right paddle
@@ -48,13 +64,16 @@ void StartGame()
              Player2Score++;
              BallVelocityX = -BallVelocityX;
         }
+        red = (float)(rand()%4)-0.6;
+        green =(float)(rand()%4)-0.4;
+        blue = (float)(rand()%4)-0.3;
     }
     glutPostRedisplay();
 } 
 void Display(void)
 {
-    StartGame();
-    glClear(GL_COLOR_BUFFER_BIT);
+    //StartGame();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Draw Center lines
     DrawCenterLines();
     // draw left paddle
@@ -85,9 +104,19 @@ void Reshape(int W, int H)
     // Draw GameObjects
 void DrawBall(int X, int Y)
 {
+    
     glPushMatrix();
     glTranslatef(X, Y, 0);
-    glColor3f(1.0, 1.0, 1.0);
+    if(X < 50 && Y < 40)
+        glColor3f(red, green, blue);
+    else if (X > 100)
+    {
+        glColor3f(red, green, blue);
+    }
+    else
+    {
+        glColor3f(red, green, blue);
+    }
     glutSolidSphere(BallRadius, 20, 16);
     glPopMatrix();
 }
@@ -99,8 +128,11 @@ void drawPaddle(int X, int Y)
     glColor3f(1.0, 1.0, 1.0);
     int height = PaddleHeight ;/// 2;
     glVertex2f(-5, height);
+    glColor3f(1.0, 0.99, 1.0);
     glVertex2f(5, height);
+    glColor3f(1.0, 0.99, 0.0);
     glVertex2f(5, -height);
+    glColor3f(1.0, 1.1, 0.0);
     glVertex2f(-5, -height);
     glEnd();
     glPopMatrix();
@@ -282,11 +314,10 @@ void DrawCenterLines()
 void DrawText(char* Text, int X, int Y, int Z)
 {
     glPushMatrix();
+    glColor3f(0.6, 0.6, 1.0);
     glTranslatef(X, Y+8, Z);
-    for(char* c = Text; *c != '\0'; c++)
-    {
-        glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
-    }
+    glScalef(0.5,0.5,1);
+    glutStrokeString(GLUT_STROKE_ROMAN, Text);
     glPopMatrix();
 }
 
@@ -307,8 +338,8 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
         glutPostRedisplay();
         break;
     case ' ':
-        BallVelocityX = 1.8;
-        BallVelocityY = 1.8;
+        BallVelocityX = 4;
+        BallVelocityY = 4;
         glutIdleFunc(StartGame);
         break;
     // exit on esc
