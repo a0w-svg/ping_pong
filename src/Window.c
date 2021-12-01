@@ -13,41 +13,41 @@ void StartGame()
     BallPosX += BallVelocityX;
     BallPosY += BallVelocityY;
     //printf("%f:%f", BallPosX, BallPosY);
-
     // ball hits the top or bottom 
     if(BallPosY + BallRadius > OrthoY || BallPosY - BallRadius < -OrthoY)
+    {
         BallVelocityY = -BallVelocityY;
+    }
     // ball hits the left paddle
     if(BallPosX - BallRadius + 5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
     {
-        if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - (PaddleHeight/2))
+        if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - PaddleHeight)
         {
             BallVelocityX  = -BallVelocityX;
-            BallVelocityX += SpeedIncrement;
-            BallVelocityY += SpeedIncrement;
+            if(BallVelocityX < 5.0 && BallVelocityY < 5.0)
+            {
+                BallVelocityX += SpeedIncrement;
+                BallVelocityY += SpeedIncrement;
+            }
             PaddileVelocity += SpeedIncrement;
+        }
+        else 
+        {
+            Player1Score++;
+            BallVelocityX = -BallVelocityX;
         }
     }
 
     // ball hits the right paddle
     if(BallPosX + BallRadius - 5 > PaddleX && BallPosX - BallRadius < PaddleX)
     {
-        if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - (PaddleHeight/2))
+        if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - PaddleHeight)
             BallVelocityX = -BallVelocityX;
-    }
-    // player one scores
-    if(BallPosX - BallRadius > OrthoX)
-    {
-        Player1Score++;
-        //printf("Player 1 = %d\n", Player1Score);
-        BallVelocityX = -BallVelocityX;
-    }
-    // player two scores
-    if(BallPosX + BallRadius < -OrthoX)
-    {
-        Player2Score++;
-        //printf("Player 2 = %d\n", Player2Score);
-        BallVelocityX = -BallVelocityX;
+        else
+        {
+             Player2Score++;
+             BallVelocityX = -BallVelocityX;
+        }
     }
     glutPostRedisplay();
 } 
@@ -97,7 +97,7 @@ void drawPaddle(int X, int Y)
     glTranslatef(X, Y, 0);
     glBegin(GL_QUADS);
     glColor3f(1.0, 1.0, 1.0);
-    int height = PaddleHeight /  2 ;/// 2;
+    int height = PaddleHeight ;/// 2;
     glVertex2f(-5, height);
     glVertex2f(5, height);
     glVertex2f(5, -height);
@@ -307,8 +307,8 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
         glutPostRedisplay();
         break;
     case ' ':
-        BallVelocityX = 1.2;
-        BallVelocityY = 1.2;
+        BallVelocityX = 1.8;
+        BallVelocityY = 1.8;
         glutIdleFunc(StartGame);
         break;
     // exit on esc
