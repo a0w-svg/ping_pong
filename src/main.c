@@ -13,7 +13,9 @@ int main(int argc, char** argv)
     glutReshapeFunc(Reshape);
     // Callback on mouse click and keyboard input
     glutKeyboardFunc(KeyboardHandler);
+    glutKeyboardUpFunc(KeyboardHandlerUp);
     glutSpecialFunc(SpecialKeyHandler);
+    glutSpecialUpFunc(SpecialKeyHandlerUp);
     glutMainLoop();
     return 0;
 }

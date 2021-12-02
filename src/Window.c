@@ -1,5 +1,6 @@
 #include "../include/Window.h"
 #include <GL/freeglut.h>
+#include <stdbool.h>
 // globals variables
 int WindowX = 800, WindowY = 1200;
 int OrthoX = 600, OrthoY = 400;
@@ -7,12 +8,15 @@ int OrthoX = 600, OrthoY = 400;
 char Score1[20] = {}, Score2[20] = {};
 GLint Player1Score = 0, Player2Score = 0;
 GLint Player1Life = 3, Player2Life = 3;
-GLint PaddleBoundary = 290, PaddleHeight = 100, PaddileVelocity = 30.0;
+GLint PaddleBoundary = 290, PaddleHeight = 100, PaddileVelocity = 8.0;
 GLint Player1PaddileY = 0, Player2PaddileY = 0, PaddleX = 595;
 GLfloat BallVelocityX = 0, BallVelocityY = 0, SpeedIncrement = 0.5;
 GLint BallPosX = 0, BallPosY = 0, BallRadius = 20;
+bool pressed_keys[5];
 
-float red = 1.0, green = 0.0, blue = 0.0;
+color_t ball_color = {.r = 255, .g = 0, .b = 0};
+color_t paddle_color1 = {.r = 0, .g = 255, .b = 0};
+color_t paddle_color2 = {.r = 0, .g = 255, .b = 150};
 void Init(void)
 {
     glClearColor(0.0, 0.0, 0.0, 0.0); // initialize display with black colors
@@ -49,9 +53,9 @@ void StartGame()
             Player1Score++;
             BallVelocityX = -BallVelocityX;
         }
-        red = (float)(rand()%255);
-        green = (float)(rand()%255);
-        blue = (float)(rand()%255);
+        ball_color.r = rand()%255;
+        ball_color.g = rand()%255;
+        ball_color.b = rand()%255;
     }
 
     // ball hits the right paddle
@@ -64,10 +68,23 @@ void StartGame()
              Player2Score++;
              BallVelocityX = -BallVelocityX;
         }
-        red = (float)(rand()%4)-0.6;
-        green =(float)(rand()%4)-0.4;
-        blue = (float)(rand()%4)-0.3;
+        ball_color.r = rand()%255;
+        ball_color.g = rand()%255;
+        ball_color.b = rand()%255;
     }
+    // move  the player1 paddle up
+    if(Player1PaddileY < PaddleBoundary && pressed_keys[1] == true)
+        Player1PaddileY += PaddileVelocity;
+    // move the player1 paddle down
+    if(Player1PaddileY > -PaddleBoundary && pressed_keys[2] == true)
+        Player1PaddileY -= PaddileVelocity;
+    // move  the player2 paddle up
+    if(Player2PaddileY < PaddleBoundary && pressed_keys[3] == true)
+        Player2PaddileY += PaddileVelocity;
+    // move  the player2 paddle down
+    if(Player2PaddileY > -PaddleBoundary && pressed_keys[4] == true)
+        Player2PaddileY -= PaddileVelocity;
+
     glutPostRedisplay();
 } 
 void Display(void)
@@ -83,11 +100,13 @@ void Display(void)
     // draw the ball 
     DrawBall(BallPosX, BallPosY);
     // draw the score on the left for player one
-    snprintf(Score1, sizeof(Score1), "%d", Player1Score);
-    DrawText(Score1, -300, 200, 0);
-    // draw the score on the right for player 2
     snprintf(Score2, sizeof(Score2), "%d", Player2Score);
-    DrawText(Score2, 200, 200, 0);
+    DrawText("Player 1:", -500, 280,0);
+    DrawText(Score2, -150, 280, 0);
+    // draw the score on the right for player 2
+    snprintf(Score1, sizeof(Score1), "%d", Player1Score);
+    DrawText("Player 2:", 100, 280,0);
+    DrawText(Score1, 450, 280, 0);
     // swap the current frame with drawn frame
     glutSwapBuffers();
     glFlush();
@@ -107,16 +126,7 @@ void DrawBall(int X, int Y)
     
     glPushMatrix();
     glTranslatef(X, Y, 0);
-    if(X < 50 && Y < 40)
-        glColor3f(red, green, blue);
-    else if (X > 100)
-    {
-        glColor3f(red, green, blue);
-    }
-    else
-    {
-        glColor3f(red, green, blue);
-    }
+    glColor3ub(ball_color.r, ball_color.g, ball_color.b);
     glutSolidSphere(BallRadius, 20, 16);
     glPopMatrix();
 }
@@ -327,15 +337,11 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
     {
     // move player one paddile up    
     case 'w':
-        if(Player1PaddileY < PaddleBoundary)
-            Player1PaddileY += PaddileVelocity;
-        glutPostRedisplay();
+        pressed_keys[1] = true;
         break;
     // move player one paddile down
     case 's':
-        if(Player1PaddileY > -PaddleBoundary)
-            Player1PaddileY -= PaddileVelocity;
-        glutPostRedisplay();
+        pressed_keys[2] = true;
         break;
     case ' ':
         BallVelocityX = 4;
@@ -351,22 +357,77 @@ void KeyboardHandler(unsigned char Key, int X, int Y)
     }
 }
 
+void KeyboardHandlerUp(unsigned char Key, int X, int Y)
+{
+    switch(Key)
+    {
+        // move player one paddile up    
+        case 'w':
+            pressed_keys[1] = false;
+            break;
+    // move player one paddile down
+        case 's':
+            pressed_keys[2] = false;
+            break;
+        default:
+            break;
+    }
+}
 void SpecialKeyHandler(int key, int x, int y)
 {
     switch(key)
     {
-        case GLUT_KEY_UP:
-            if(Player2PaddileY < PaddleBoundary)
-                Player2PaddileY += PaddileVelocity;
-            glutPostRedisplay();
+        // set the  move the player 2 paddle up flag
+        case GLUT_KEY_UP: 
+            pressed_keys[3]  = true;
             break;
+        //set the  move the player 2 paddle down flag
         case GLUT_KEY_DOWN:
-            if(Player2PaddileY > -PaddleBoundary)
-                Player2PaddileY -= PaddileVelocity;
-            glutPostRedisplay();
+            pressed_keys[4] = true;
             break;
         default:
             break;
     }
 
+}
+void SpecialKeyHandlerUp(int key, int x, int y)
+{
+    switch(key)
+    {
+        // release the  move the player 2 paddle up flag
+        case GLUT_KEY_UP: 
+            pressed_keys[3]  = false;
+            break;
+        // release the  move the player 2 paddle down flag
+        case GLUT_KEY_DOWN:
+            pressed_keys[4] = false;
+            break;
+        default:
+            break;
+    }
+
+}
+
+void CreateMenu()
+{
+    int menu;
+    // create the menu and set the function to handle the events
+    menu  = glutCreateMenu(ProcessMenuEvents); 
+    // menu entries
+    glutAddMenuEntry("Red", RED);
+    glutAddMenuEntry("Blue", BLUE);
+    glutAddMenuEntry("Green", GREEN);
+    glutAddMenuEntry("Orange", ORANGE);
+    // attach the menu to the right button
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void ProcessMenuEvents(int option)
+{
+   /* switch(option)
+    {
+        case RED:
+            red = 1.0f;
+    }
+    */
 }
