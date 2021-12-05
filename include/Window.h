@@ -4,14 +4,15 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 #include <stdio.h>
 // constants
-#define RED 1
-#define GREEN 2
-#define BLUE 3
-#define ORANGE 4
-
+#define STARTGAME 1
+#define RESETGAME 2
+#define SINGLEPLAYER 3
+#define MULTIPLAYER 4
+#define QUIT 5
 typedef struct
 {
     char r;

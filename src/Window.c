@@ -10,16 +10,17 @@ GLint Player1Score = 0, Player2Score = 0;
 GLint Player1Life = 3, Player2Life = 3;
 GLint PaddleBoundary = 290, PaddleHeight = 100, PaddileVelocity = 8.0;
 GLint Player1PaddileY = 0, Player2PaddileY = 0, PaddleX = 595;
-GLfloat BallVelocityX = 0, BallVelocityY = 0, SpeedIncrement = 0.5;
+GLfloat BallVelocityX = 0, BallVelocityY = 0, SpeedIncrement = 1.5;
 GLint BallPosX = 0, BallPosY = 0, BallRadius = 20;
 bool pressed_keys[5];
-
+int menu_selected_options[10];
 color_t ball_color = {.r = 255, .g = 0, .b = 0};
 color_t paddle_color1 = {.r = 0, .g = 255, .b = 0};
 color_t paddle_color2 = {.r = 0, .g = 255, .b = 150};
 void Init(void)
 {
     glClearColor(0.0, 0.0, 0.0, 0.0); // initialize display with black colors
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glShadeModel(GL_FLAT);
     srand(time(NULL));
 }
@@ -27,8 +28,8 @@ void Init(void)
 void StartGame()
 {
     // move the ball
-    BallPosX += BallVelocityX;
-    BallPosY += BallVelocityY;
+    BallPosX += BallVelocityX * SpeedIncrement;
+    BallPosY += BallVelocityY * SpeedIncrement;
     //printf("%f:%f", BallPosX, BallPosY);
     // ball hits the top or bottom 
     if(BallPosY + BallRadius > OrthoY || BallPosY - BallRadius < -OrthoY)
@@ -36,16 +37,12 @@ void StartGame()
         BallVelocityY = -BallVelocityY;
     }
     // ball hits the left paddle
-    if(BallPosX - BallRadius + 5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
+    if(BallPosX - BallRadius -5 < -PaddleX && BallPosX - BallRadius < -PaddleX)
     {
-        if(BallPosY < Player1PaddileY + PaddleHeight && BallPosY > Player1PaddileY - PaddleHeight)
+        if(BallPosY < Player1PaddileY + PaddleHeight+5 && BallPosY > Player1PaddileY - PaddleHeight-5)
         {
             BallVelocityX  = -BallVelocityX;
-            if(BallVelocityX < 7.0 && BallVelocityY < 7.0)
-            {
-                BallVelocityX += SpeedIncrement;
-                BallVelocityY += SpeedIncrement;
-            }
+            
             PaddileVelocity += SpeedIncrement;
         }
         else 
@@ -59,7 +56,7 @@ void StartGame()
     }
 
     // ball hits the right paddle
-    if(BallPosX + BallRadius - 5 > PaddleX && BallPosX - BallRadius < PaddleX)
+    if(BallPosX + BallRadius + 10 > PaddleX && BallPosX - BallRadius < PaddleX)
     {
         if(BallPosY < Player2PaddileY + PaddleHeight && BallPosY > Player2PaddileY - PaddleHeight)
             BallVelocityX = -BallVelocityX;
@@ -72,6 +69,7 @@ void StartGame()
         ball_color.g = rand()%255;
         ball_color.b = rand()%255;
     }
+
     // move  the player1 paddle up
     if(Player1PaddileY < PaddleBoundary && pressed_keys[1] == true)
         Player1PaddileY += PaddileVelocity;
@@ -84,7 +82,7 @@ void StartGame()
     // move  the player2 paddle down
     if(Player2PaddileY > -PaddleBoundary && pressed_keys[4] == true)
         Player2PaddileY -= PaddileVelocity;
-
+    Player2PaddileY = (BallPosY * 0.60);
     glutPostRedisplay();
 } 
 void Display(void)
@@ -137,13 +135,13 @@ void drawPaddle(int X, int Y)
     glBegin(GL_QUADS);
     glColor3f(1.0, 1.0, 1.0);
     int height = PaddleHeight ;/// 2;
-    glVertex2f(-5, height);
+    glVertex2f(-10, height);
     glColor3f(1.0, 0.99, 1.0);
-    glVertex2f(5, height);
+    glVertex2f(10, height);
     glColor3f(1.0, 0.99, 0.0);
-    glVertex2f(5, -height);
+    glVertex2f(10, -height);
     glColor3f(1.0, 1.1, 0.0);
-    glVertex2f(-5, -height);
+    glVertex2f(-10, -height);
     glEnd();
     glPopMatrix();
 }
@@ -410,14 +408,14 @@ void SpecialKeyHandlerUp(int key, int x, int y)
 
 void CreateMenu()
 {
-    int menu;
+    static int menu, game_menu_id;
     // create the menu and set the function to handle the events
     menu  = glutCreateMenu(ProcessMenuEvents); 
     // menu entries
-    glutAddMenuEntry("Red", RED);
-    glutAddMenuEntry("Blue", BLUE);
-    glutAddMenuEntry("Green", GREEN);
-    glutAddMenuEntry("Orange", ORANGE);
+    glutAddSubMenu("Start Game", game_menu_id);
+    glutAddMenuEntry("Reset Game", RESETGAME);
+    glutAddMenuEntry("Quit", QUIT);
+    game_menu_id = glutCreateMenu(menu);
     // attach the menu to the right button
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
